@@ -8,25 +8,25 @@ module BradescoApi
           sig { returns(String) }
           attr_accessor :original
 
-          sig { returns(BradescoApi::Entity::Pix::Attributes::FineForDelay) }
+          sig { returns(T.nilable(BradescoApi::Entity::Pix::Attributes::FineForDelay)) }
           attr_accessor :fine_for_delay
 
-          sig { returns(BradescoApi::Entity::Pix::Attributes::Tax) }
+          sig { returns(T.nilable(BradescoApi::Entity::Pix::Attributes::Tax)) }
           attr_accessor :tax
 
-          sig { returns(BradescoApi::Entity::Pix::Attributes::Discount) }
+          sig { returns(T.nilable(BradescoApi::Entity::Pix::Attributes::Discount)) }
           attr_accessor :discount
 
-          sig { returns(BradescoApi::Entity::Pix::Attributes::Reduction) }
+          sig { returns(T.nilable(BradescoApi::Entity::Pix::Attributes::Reduction)) }
           attr_accessor :reduction
 
           sig do
             params(
               original: String,
-              fine_for_delay: FineForDelay,
-              tax: Tax,
-              discount: Discount,
-              reduction: Reduction
+              fine_for_delay: T.nilable(BradescoApi::Entity::Pix::Attributes::FineForDelay),
+              tax: T.nilable(BradescoApi::Entity::Pix::Attributes::Tax),
+              discount: T.nilable(BradescoApi::Entity::Pix::Attributes::Discount),
+              reduction: T.nilable(BradescoApi::Entity::Pix::Attributes::Reduction)
             ).void
           end
           def initialize(

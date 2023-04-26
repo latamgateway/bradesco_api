@@ -8,7 +8,7 @@ module BradescoApi
         attr_accessor :revision
 
         sig { returns(String) }
-        attr_accessor :status, :identifier, :pix_copy_paste, :free_text
+        attr_accessor :status, :identifier, :emv, :free_text
 
         sig { returns(BradescoApi::Entity::Pix::Attributes::Seller) }
         attr_accessor :seller
@@ -21,7 +21,7 @@ module BradescoApi
             pix_key: String,
             status: String,
             identifier: String,
-            pix_copy_paste: String,
+            emv: String,
             free_text: String,
             revision: Integer,
             locale: T.nilable(BradescoApi::Entity::Pix::Attributes::Locale),
@@ -36,7 +36,7 @@ module BradescoApi
           pix_key:,
           status:,
           identifier:,
-          pix_copy_paste:,
+          emv:,
           free_text: '',
           revision: 0,
           locale: nil,
@@ -49,7 +49,7 @@ module BradescoApi
           @pix_key = pix_key
           @status = status
           @identifier = identifier
-          @pix_copy_paste = pix_copy_paste
+          @emv = emv
           @free_text = free_text
           @revision = revision
           @locale = locale

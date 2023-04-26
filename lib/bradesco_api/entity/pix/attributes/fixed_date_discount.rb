@@ -2,7 +2,7 @@ module BradescoApi
   module Entity
     module Pix
       module Attributes
-        class FixedDateDiscount < BradescoApi::Entity::Pix::Attributes::CommonFieldsValue
+        class FixedDateDiscount
           extend T::Sig
 
           sig { returns(String) }

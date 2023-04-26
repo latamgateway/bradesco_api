@@ -70,7 +70,7 @@ module BradescoApi
             .returns(T::Hash[Symbol, T.untyped])
         end
         def serialize_body(billing)
-          {
+          body = {
             "calendario": {
               "dataDeVencimento": billing.calendar.due_date,
               "validadeAposVencimento": billing.calendar.limit_after_due_date
@@ -85,10 +85,44 @@ module BradescoApi
             },
             "valor": {
               "original": billing.value.original,
+              # "abatimento": {
+              #   "modalidade": billing.value.reduction.modality,
+              #   "valorPerc": billing.value.reduction.percentage_value
+              # },
+              # "desconto": {
+              #   "modalidade": billing.value.discount.modality,
+              #   "descontoDataFixa": billing.value.discount.fixed_date_discount
+              # }
             },
             "chave": billing.pix_key,
             "solicitacaoPagador": billing.free_text
           }
+
+          unless billing.value.fine_for_delay.nil?
+            fine_for_delay = {
+              "modalidade": billing.value.fine_for_delay.modality,
+              "valorPerc": billing.value.fine_for_delay.percentage_value
+            }
+
+            value = body[:valor]
+            value["multa"] = fine_for_delay
+            body[:valor] = value
+          end
+
+          unless billing.value.tax.nil?
+            tax = {
+              "modalidade": billing.value.tax.modality,
+              "valorPerc": billing.value.tax.percentage_value
+            }
+
+            value = body[:valor]
+            value["juros"] = tax
+            body[:valor] = value
+          end
+
+          puts body
+
+          body
         end
 
         sig do
@@ -144,7 +178,7 @@ module BradescoApi
             pix_key: data['chave'],
             status: data['status'],
             identifier: data['txid'],
-            pix_copy_paste: data['pixCopiaECola'],
+            emv: data['pixCopiaECola'] || data['emv'],
             free_text: data['solicitacaoPagador'],
             revision: data['revisao'],
             locale: locale,
