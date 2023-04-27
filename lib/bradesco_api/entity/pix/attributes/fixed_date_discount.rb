@@ -11,6 +11,9 @@ module BradescoApi
           sig { returns(String) }
           attr_accessor :percentage_value
 
+          # sig { returns(String) }
+          # attr_accessor :percentage_value
+
           sig { params(date: String, percentage_value: String).void }
           def initialize(date:, percentage_value: nil)
             @date = date
