@@ -85,14 +85,6 @@ module BradescoApi
             },
             "valor": {
               "original": billing.value.original,
-              # "abatimento": {
-              #   "modalidade": billing.value.reduction.modality,
-              #   "valorPerc": billing.value.reduction.percentage_value
-              # },
-              # "desconto": {
-              #   "modalidade": billing.value.discount.modality,
-              #   "descontoDataFixa": billing.value.discount.fixed_date_discount
-              # }
             },
             "chave": billing.pix_key,
             "solicitacaoPagador": billing.free_text
@@ -120,27 +112,52 @@ module BradescoApi
             body[:valor] = value
           end
 
-          unless billing.reduction.nil?
+          unless billing.value.reduction.nil?
             body[:valor]["abatimento"] = {
               "modalidade": billing.value.reduction.modality,
-              "valorPerc": billing.reduction.percentage_value
+              "valorPerc": billing.value.reduction.percentage_value
             }
           end
 
-          unless billing.discount.nil?
-            body[:valor]["desconto"] = {
-              "modalidade": billing.value.reduction.modality,
-              "valorPerc": billing.reduction.percentage_value
+          unless billing.value.discount.nil?
+            discount = {
+              "modalidade": billing.value.discount.modality,
+              "valorPerc": billing.value.discount.percentage_value
             }
-            unless billing.discount.fixed_date_discount.empty?
-              body[:valor]["desconto"]["descontoDataFixa"] = billing.discount.fixed_date_discount
+
+            fixed_dates = []
+            unless billing.value.discount.fixed_date_discount.empty?
+              billing.value.discount.fixed_date_discount.each do |f|
+                fixed_dates << {
+                  "data": f.date,
+                  "valorPerc": f.percentage_value
+                }
+              end
             end
+
+            discount.delete(:valorPerc) if is_modality_by_date?(billing.value.discount.modality)
+
+            body[:valor]["desconto"] = {
+              **discount,
+              "descontoDataFixa": is_modality_by_date?(billing.value.discount.modality) ? fixed_dates : []
+            }
           end
 
 
           puts body
 
           body
+        end
+
+        def is_modality_by_date?(modality)
+          ["1", "2"].include?(modality)
+        end
+
+        def common_value_attrs(obj)
+          {
+            "modalidade": obj[:modality],
+            "valorPerc": obj[:percentage]
+          }
         end
 
         sig do
@@ -211,6 +228,9 @@ module BradescoApi
             .returns(BradescoApi::Entity::Errors::ResponseApi)
         end
         def serialize_error(payload)
+          puts "---------------------------------"
+          puts payload
+          puts "---------------------------------"
           data = JSON.parse(payload)
 
           falts = []

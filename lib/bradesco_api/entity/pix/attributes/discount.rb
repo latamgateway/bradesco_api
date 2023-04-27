@@ -5,7 +5,7 @@ module BradescoApi
         class Discount < BradescoApi::Entity::Pix::Attributes::CommonFieldsValue
           extend T::Sig
 
-          sig { returns(BradescoApi::Entity::Pix::Attributes::FixedDateDiscount) }
+          sig { returns(T::Array[BradescoApi::Entity::Pix::Attributes::FixedDateDiscount]) }
           attr_accessor :fixed_date_discount
 
           sig do

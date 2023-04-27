@@ -6,11 +6,11 @@ module BradescoApi
           extend T::Sig
 
           sig { returns(String) }
-          attr_accessor :data, :percentage_value
+          attr_accessor :date, :percentage_value
 
-          sig { params(data: String, percentage_value: String).void }
-          def initialize(data:, percentage_value:)
-            @data = data
+          sig { params(date: String, percentage_value: String).void }
+          def initialize(date:, percentage_value:)
+            @date = date
             @percentage_value = percentage_value
           end
         end
