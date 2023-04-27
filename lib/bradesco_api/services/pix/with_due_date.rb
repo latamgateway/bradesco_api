@@ -120,6 +120,24 @@ module BradescoApi
             body[:valor] = value
           end
 
+          unless billing.reduction.nil?
+            body[:valor]["abatimento"] = {
+              "modalidade": billing.value.reduction.modality,
+              "valorPerc": billing.reduction.percentage_value
+            }
+          end
+
+          unless billing.discount.nil?
+            body[:valor]["desconto"] = {
+              "modalidade": billing.value.reduction.modality,
+              "valorPerc": billing.reduction.percentage_value
+            }
+            unless billing.discount.fixed_date_discount.empty?
+              body[:valor]["desconto"]["descontoDataFixa"] = billing.discount.fixed_date_discount
+            end
+          end
+
+
           puts body
 
           body
