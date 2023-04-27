@@ -10,24 +10,16 @@ module BradescoApi
         sig { returns(BradescoApi::Entity::Pix::WithDueDate) }
         attr_accessor :billing
 
-        sig { returns(BradescoApi::Entity::Security::SSLConfig) }
-        attr_accessor :ssl_config
-
-        sig { returns(BradescoApi::Entity::Security::Credentials) }
-        attr_accessor :credentials
-
         sig do
           params(
             billing: BradescoApi::Entity::Pix::WithDueDate,
-            credentials: BradescoApi::Entity::Security::Credentials,
-            ssl_config: BradescoApi::Entity::Security::SSLConfig
+            with_qr_code: T::Boolean
           ).void
         end
 
-        def initialize(billing:, credentials:, ssl_config:)
+        def initialize(billing:, with_qr_code: false)
           @billing = billing
-          @credentials = credentials
-          @ssl_config = ssl_config
+          @with_qr_code = with_qr_code
         end
 
         sig do
@@ -36,10 +28,7 @@ module BradescoApi
         end
         def create(identifier)
 
-          st = BradescoApi::Services::System::Token.new(
-            ssl_config: @ssl_config,
-            credentials: @credentials
-          )
+          st = BradescoApi::Services::System::Token.new()
           token = st.create
 
           headers = {
@@ -47,11 +36,14 @@ module BradescoApi
             'Content-Type': 'application/json'
           }
 
-          uri = "https://qrpix-h.bradesco.com.br/v2/cobv/#{identifier}"
+          endpoint = "/v2/cobv/#{identifier}"
+          if @with_qr_code
+            endpoint = "/v2/cobv-emv/#{identifier}"
+          end
 
-          http = BradescoApi::Utils::HTTP.new(@ssl_config)
+          http = BradescoApi::Utils::HTTP.new()
           response = http.put(
-            uri: uri,
+            endpoint: endpoint,
             payload: JSON.dump(serialize_body(billing)),
             headers: headers
           )
@@ -143,6 +135,9 @@ module BradescoApi
             }
           end
 
+          if @with_qr_code
+            body["nomePersonalizacaoQr"] = billing.qr_code_text
+          end
 
           puts body
 
@@ -167,7 +162,11 @@ module BradescoApi
         def deserialize_response(payload)
           data = JSON.parse(payload)
 
-          puts data
+          if @with_qr_code
+            data['cobv']['emv'] = data['emv']
+            data['cobv']['base64'] = data['base64']
+            data = data['cobv']
+          end
 
           calendar = BradescoApi::Entity::Pix::Attributes::Calendar.new(
             due_date: data['calendario']['dataDeVencimento'],
@@ -214,6 +213,7 @@ module BradescoApi
             status: data['status'],
             identifier: data['txid'],
             emv: data['pixCopiaECola'] || data['emv'],
+            base64: data['base64'] || '',
             free_text: data['solicitacaoPagador'],
             revision: data['revisao'],
             locale: locale,

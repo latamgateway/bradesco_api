@@ -3,30 +3,30 @@ module BradescoApi
     class HTTP
       extend T::Sig
 
-      sig do
-        params(
-          ssl_config: BradescoApi::Entity::Security::SSLConfig
-        ).void
+      def initialize()
+        pfx_file = ENV['BRADESCO_PIX_PFX_PATH']
+        pfx_password = ENV['BRADESCO_PIX_PFX_PASSWORD']
+
+        pkcs = OpenSSL::PKCS12.new(File.read(pfx_file), pfx_password)
+        @key = pkcs.key.to_pem
+        @cert = pkcs.certificate.to_pem
+        @base_url = ENV['BRADESCO_PIX_BASE_URL']
       end
 
-      def initialize(ssl_config)
-        @ssl_config = ssl_config
-      end
-
       sig do
         params(
-          uri: String,
+          endpoint: String,
           payload: String,
           headers: T::Hash[String, String],
         ).returns(T.untyped)
       end
-      def post(uri:, payload:, headers: {})
-        url = URI(uri)
+      def post(endpoint:, payload:, headers: {})
+        url = URI("#{@base_url}#{endpoint}")
 
         https = Net::HTTP.new(url.host, url.port)
         https.use_ssl = true
-        https.cert = OpenSSL::X509::Certificate.new(@ssl_config.cert)
-        https.key = OpenSSL::PKey::RSA.new(@ssl_config.key)
+        https.cert = OpenSSL::X509::Certificate.new(@cert)
+        https.key = OpenSSL::PKey::RSA.new(@key)
 
         request = Net::HTTP::Post.new(url)
         headers.each do |key, value|
@@ -40,19 +40,19 @@ module BradescoApi
 
       sig do
         params(
-          uri: String,
+          endpoint: String,
           payload: String,
           headers: T::Hash[String, String],
           ).returns(T.untyped)
       end
 
-      def put(uri:, payload:, headers: {})
-        url = URI(uri)
+      def put(endpoint:, payload:, headers: {})
+        url = URI("#{@base_url}#{endpoint}")
 
         https = Net::HTTP.new(url.host, url.port)
         https.use_ssl = true
-        https.cert = OpenSSL::X509::Certificate.new(@ssl_config.cert)
-        https.key = OpenSSL::PKey::RSA.new(@ssl_config.key)
+        https.cert = OpenSSL::X509::Certificate.new(@cert)
+        https.key = OpenSSL::PKey::RSA.new(@key)
 
         request = Net::HTTP::Put.new(url)
         headers.each do |key, value|

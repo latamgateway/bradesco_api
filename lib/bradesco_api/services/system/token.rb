@@ -2,33 +2,18 @@ module BradescoApi
   module Services
     module System
       class Token
-        extend T::Sig
 
-        sig { returns(BradescoApi::Entity::Security::SSLConfig) }
-        attr_accessor :ssl_config
-
-        sig { returns(BradescoApi::Entity::Security::Credentials) }
-        attr_accessor :credentials
-
-        sig do
-          params(
-            ssl_config: BradescoApi::Entity::Security::SSLConfig,
-            credentials: BradescoApi::Entity::Security::Credentials
-          ).void
-        end
-
-        def initialize(ssl_config:, credentials:)
-          @ssl_config = ssl_config
-          @credentials = credentials
+        def initialize()
+          @client_id = ENV['BRADESCO_PIX_CLIENT_ID']
+          @client_secret = ENV['BRADESCO_PIX_CLIENT_SECRET']
         end
 
         def create
-          puts "Cheguei aqui"
-          http = BradescoApi::Utils::HTTP.new(@ssl_config)
-          # TODO: CHANGE VIA ENV VARS
-          uri = "https://qrpix-h.bradesco.com.br/oauth/token"
+          http = BradescoApi::Utils::HTTP.new()
 
-          basic = Base64.strict_encode64("#{@credentials.client_id}:#{@credentials.client_secret}")
+          endpoint = "/oauth/token"
+
+          basic = Base64.strict_encode64("#{@client_id}:#{@client_secret}")
 
           headers = {
             'Authorization': "Basic #{basic}",
@@ -36,7 +21,7 @@ module BradescoApi
           }
 
           response = http.post(
-            uri: uri,
+            endpoint: endpoint,
             payload: "grant_type=client_credentials",
             headers: headers
           )

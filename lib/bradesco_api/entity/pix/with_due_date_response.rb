@@ -8,7 +8,7 @@ module BradescoApi
         attr_accessor :revision
 
         sig { returns(String) }
-        attr_accessor :status, :identifier, :emv, :free_text
+        attr_accessor :status, :identifier, :emv, :free_text, :base64
 
         sig { returns(BradescoApi::Entity::Pix::Attributes::Seller) }
         attr_accessor :seller
@@ -22,6 +22,7 @@ module BradescoApi
             status: String,
             identifier: String,
             emv: String,
+            base64: String,
             free_text: String,
             revision: Integer,
             locale: T.nilable(BradescoApi::Entity::Pix::Attributes::Locale),
@@ -37,6 +38,7 @@ module BradescoApi
           status:,
           identifier:,
           emv:,
+          base64: '',
           free_text: '',
           revision: 0,
           locale: nil,
@@ -50,6 +52,7 @@ module BradescoApi
           @status = status
           @identifier = identifier
           @emv = emv
+          @base64 = base64
           @free_text = free_text
           @revision = revision
           @locale = locale
