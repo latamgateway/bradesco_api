@@ -205,6 +205,10 @@ module BradescoApi
             original: data['valor']['original'],
           )
 
+          value[:multa] = data['valor']['multa'] if data['valor'].key?(:multa)
+          value[:juros] = data['valor']['juros'] if data['valor'].key?(:juros)
+          value[:abatimento] = data['valor']['abatimento'] if data['abatimento'].key?(:multa)
+
           BradescoApi::Entity::Pix::WithDueDateResponse.new(
             customer: customer,
             value: value,
