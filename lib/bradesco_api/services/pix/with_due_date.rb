@@ -145,7 +145,7 @@ module BradescoApi
         end
 
         def is_modality_by_date?(modality)
-          ["1", "2"].include?(modality)
+          [1, 2].include?(modality)
         end
 
         def common_value_attrs(obj)
@@ -205,10 +205,51 @@ module BradescoApi
             original: data['valor']['original'],
           )
 
-          value[:multa] = data['valor']['multa'] if data['valor'].key?(:multa)
-          value[:juros] = data['valor']['juros'] if data['valor'].key?(:juros)
-          value[:abatimento] = data['valor']['abatimento'] if data['abatimento'].key?(:multa)
+          if data['valor'].include?('multa')
+            value.fine_for_delay = BradescoApi::Entity::Pix::Attributes::FineForDelay.new(
+              modality: data['valor']['multa']['modalidade'],
+              percentage_value: data['valor']['multa']['valorPerc']
+            )
+          end
 
+          if data['valor'].include?('juros')
+            value.tax = BradescoApi::Entity::Pix::Attributes::Tax.new(
+              modality: data['valor']['juros']['modalidade'],
+              percentage_value: data['valor']['juros']['valorPerc']
+            )
+          end
+
+          if data['valor'].include?('abatimento')
+            value.reduction = BradescoApi::Entity::Pix::Attributes::Reduction.new(
+              modality: data['valor']['abatimento']['modalidade'],
+              percentage_value: data['valor']['abatimento']['valorPerc']
+            )
+          end
+
+          if data['valor'].include?('desconto')
+            if [1, 2].include?(data['valor']['desconto']['modalidade'])
+              fixed_date_arr = []
+              data['valor']['desconto']['descontoDataFixa'].each do |c|
+                fixed_date_arr << BradescoApi::Entity::Pix::Attributes::FixedDateDiscount.new(
+                  date: c['data'],
+                  percentage_value: c['valorPerc'] 
+                )
+              end
+              puts fixed_date_arr.inspect
+
+              value.discount = BradescoApi::Entity::Pix::Attributes::Discount.new(
+                modality: data['valor']['desconto']['modalidade'],
+                fixed_date_discount: fixed_date_arr 
+              )
+            else
+              value.discount = BradescoApi::Entity::Pix::Attributes::Discount.new(
+                modality: data['valor']['desconto']['modalidade'],
+                percentage_value: data['valor']['desconto']['valorPerc']
+              )
+            end
+          end
+
+          
           BradescoApi::Entity::Pix::WithDueDateResponse.new(
             customer: customer,
             value: value,

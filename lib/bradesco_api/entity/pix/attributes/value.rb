@@ -48,5 +48,3 @@ module BradescoApi
     end
   end
 end
-
-a = BradescoApi::Entity::Pix::Attributes::FineForDelay.new(modality: "", percentage_value: "")

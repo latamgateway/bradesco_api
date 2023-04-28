@@ -5,10 +5,13 @@ module BradescoApi
         class CommonFieldsValue
           extend T::Sig
 
-          sig { returns(String) }
-          attr_accessor :modality, :percentage_value
+          sig { returns(Integer) }
+          attr_accessor :modality
 
-          sig { params(modality: String, percentage_value: String).void }
+          sig { returns(String) }
+          attr_accessor :percentage_value
+       
+          sig { params(modality: Integer, percentage_value: String).void }
           def initialize(modality:, percentage_value:)
             @modality = modality
             @percentage_value = percentage_value
