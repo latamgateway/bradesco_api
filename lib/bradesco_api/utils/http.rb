@@ -64,6 +64,29 @@ module BradescoApi
         https.request(request)
       end
 
+      sig do
+        params(
+          endpoint: String,
+          headers: T::Hash[String, String],
+          ).returns(T.untyped)
+      end
+
+      def get(endpoint:, headers: {})
+        url = URI("#{@base_url}#{endpoint}")
+
+        https = Net::HTTP.new(url.host, url.port)
+        https.use_ssl = true
+        https.cert = OpenSSL::X509::Certificate.new(@cert)
+        https.key = OpenSSL::PKey::RSA.new(@key)
+
+        request = Net::HTTP::Get.new(url)
+        headers.each do |key, value|
+          request[key] = value
+        end
+
+        https.request(request)
+      end
+
     end
   end
 end

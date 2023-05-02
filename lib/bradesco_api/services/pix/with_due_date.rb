@@ -7,18 +7,24 @@ module BradescoApi
       class WithDueDate
         extend T::Sig
 
-        sig { returns(BradescoApi::Entity::Pix::WithDueDate) }
+        sig { returns(T.nilable(BradescoApi::Entity::Pix::WithDueDate)) }
         attr_accessor :billing
+
+        sig { returns(T.nilable(T::Boolean)) }
+        attr_accessor :with_qr_code
 
         sig do
           params(
-            billing: BradescoApi::Entity::Pix::WithDueDate,
-            with_qr_code: T::Boolean
+            billing: T.nilable(BradescoApi::Entity::Pix::WithDueDate),
+            with_qr_code: T.nilable(T::Boolean)
           ).void
         end
 
-        def initialize(billing:, with_qr_code: false)
-          @billing = billing
+        def initialize(billing: nil, with_qr_code: false)
+          unless billing.nil?
+            @billing = billing
+          end
+
           @with_qr_code = with_qr_code
         end
 
@@ -53,6 +59,33 @@ module BradescoApi
           end
 
           serialize_error(response.read_body)
+        end
+
+        def get(identifier)
+          st = BradescoApi::Services::System::Token.new()
+          token = st.create
+
+          puts st
+
+          headers = {
+            'Authorization': "Bearer #{token.access_token}",
+            'Content-Type': 'application/json'
+          }
+
+          endpoint = "/v2/cobv/#{identifier}"
+
+          http = BradescoApi::Utils::HTTP.new()
+          response = http.get(
+            endpoint: endpoint,
+            headers: headers
+          )
+
+          if response.code.to_i == 200
+            return deserialize_response(response.read_body)
+          end
+
+          serialize_error(response.read_body)
+          puts response.read_body
         end
 
         private
@@ -266,7 +299,6 @@ module BradescoApi
             additional_information: nil
           )
         end
-
 
         sig do
           params(payload: String)
