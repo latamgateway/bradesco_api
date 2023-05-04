@@ -1,3 +1,5 @@
+require "json"
+
 module BradescoApi
   module Entity
     module Pix
@@ -30,8 +32,16 @@ module BradescoApi
           @description = description
         end
 
+        sig { returns(String) }
         def serialize
+          payload = {
+            "valor": @value
+          }
 
+          payload["natureza"] = @operation unless @operation.empty?
+          payload["descricao"] = @description unless @description.empty?
+
+          JSON.dump(payload)
         end
       end
     end

@@ -36,6 +36,7 @@ module BradescoApi
         sig { returns(BradescoApi::Entity::Pix::RefundResponseTime) }
         attr_accessor :time
 
+        sig { params(payload: String).void }
         def initialize(payload)
           # @status = status
           # @rtr_id = rtr_id

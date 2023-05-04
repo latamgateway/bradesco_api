@@ -59,8 +59,9 @@ module BradescoApi
           @additional_information = additional_information
         end
 
+        sig { returns(String) }
         def serialize
-          body = {
+          payload = {
             "calendario": {
               "dataDeVencimento": @calendar.due_date,
               "validadeAposVencimento": @calendar.limit_after_due_date
@@ -80,34 +81,9 @@ module BradescoApi
             "solicitacaoPagador": @free_text
           }
 
-          unless @value.fine_for_delay.nil?
-            fine_for_delay = {
-              "modalidade": @value.fine_for_delay.modality,
-              "valorPerc": @value.fine_for_delay.percentage_value
-            }
-
-            value = body[:valor]
-            value["multa"] = fine_for_delay
-            body[:valor] = value
-          end
-
-          unless @value.tax.nil?
-            tax = {
-              "modalidade": @value.tax.modality,
-              "valorPerc": @value.tax.percentage_value
-            }
-
-            value = body[:valor]
-            value["juros"] = tax
-            body[:valor] = value
-          end
-
-          unless @value.reduction.nil?
-            body[:valor]["abatimento"] = {
-              "modalidade": @value.reduction.modality,
-              "valorPerc": @value.reduction.percentage_value
-            }
-          end
+          payload[:valor]["multa"] = common_value_attrs(@value.fine_for_delay) unless @value.fine_for_delay.nil?
+          payload[:valor]["juros"] = common_value_attrs(@value.tax) unless @value.tax.nil?
+          payload[:valor]["abatimento"] = common_value_attrs(@value.reduction) unless @value.reduction.nil?
 
           unless @value.discount.nil?
             discount = {
@@ -127,29 +103,38 @@ module BradescoApi
 
             discount.delete(:valorPerc) if is_modality_by_date?(@value.discount.modality)
 
-            body[:valor]["desconto"] = {
+            payload[:valor]["desconto"] = {
               **discount,
               "descontoDataFixa": is_modality_by_date?(@value.discount.modality) ? fixed_dates : []
             }
           end
 
           unless @qr_code_text.empty?
-            body["nomePersonalizacaoQr"] = @qr_code_text
+            payload["nomePersonalizacaoQr"] = @qr_code_text
           end
 
-          JSON.dump(body)
+          JSON.dump(payload)
         end
 
-        private
+        protected
 
+        sig do
+          params(modality: Integer).returns(T::Boolean)
+        end
         def is_modality_by_date?(modality)
           [1, 2].include?(modality)
         end
 
-        def common_value_attrs(obj)
+        private
+
+        sig do
+          params(common_value: BradescoApi::Entity::Pix::Attributes::CommonFieldsValue)
+            .returns(T::Hash[Symbol, T.untyped])
+        end
+        def common_value_attrs(common_value)
           {
-            "modalidade": obj[:modality],
-            "valorPerc": obj[:percentage]
+            "modalidade": common_value.modality,
+            "valorPerc": common_value.percentage_value
           }
         end
 

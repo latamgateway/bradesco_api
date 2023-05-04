@@ -33,28 +33,33 @@ module BradescoApi
         attr_accessor :falts
 
         sig do
-          params(
-            status: String,
-            type: String,
-            title: String,
-            falts: T::Array[BradescoApi::Entity::Errors::Falt],
-            related_id: String,
-          ).void
+          params(payload: String).void
         end
 
-        def initialize(
-          status: ,
-          type: '',
-          title: '',
-          falts: [],
-          related_id: ''
-        )
-          @status = status
-          @type = type
-          @title = title
+        def initialize(payload)
+          data = JSON.parse(payload)
+
+          falts = []
+          if data.has_key?('violacoes')
+            data['violacoes'].each do |falt|
+              d = BradescoApi::Entity::Errors::Falt.new(
+                reason: falt['razao'],
+                property: falt['propriedade'],
+                value: falt['valor'],
+                )
+
+              falts << d
+            end
+          end
+
+
+          @status = data['status'].to_s || '500'
+          @type = data['type']
+          @title = data['title']
           @falts = falts
-          @related_id = related_id
+          @related_id = data['correlationId'] || ''
         end
+
       end
     end
   end

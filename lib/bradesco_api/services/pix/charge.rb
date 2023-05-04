@@ -4,7 +4,7 @@ require "json"
 module BradescoApi
   module Services
     module Pix
-      class WithDueDate
+      class Charge < BradescoApi::Services::Pix::Base
         extend T::Sig
 
         sig do
@@ -23,7 +23,7 @@ module BradescoApi
           )
 
           return BradescoApi::Entity::Pix::ChargeResponse.new(response.read_body) if response.kind_of? Net::HTTPSuccess
-          serialize_response_error(response.read_body)
+          BradescoApi::Entity::Errors::ResponseApi.new(response.read_body)
         end
 
         sig do
@@ -40,7 +40,8 @@ module BradescoApi
             headers: headers
           )
 
-          build_response(response)
+          return BradescoApi::Entity::Pix::ChargeResponse.new(response.read_body) if response.kind_of? Net::HTTPSuccess
+          BradescoApi::Entity::Errors::ResponseApi.new(response.read_body)
         end
 
         sig do
@@ -59,55 +60,8 @@ module BradescoApi
           )
 
           return BradescoApi::Entity::Pix::RefundResponse.new(response.read_body) if response.kind_of? Net::HTTPSuccess
-          serialize_response_error(response.read_body)
+          BradescoApi::Entity::Errors::ResponseApi.new(response.read_body)
         end
-
-        private
-
-        def build_response(response)
-
-        end
-
-        def headers
-          st = BradescoApi::Services::System::Token.new()
-          token = st.create
-
-          headers = {
-            'Authorization': "Bearer #{token.access_token}",
-            'Content-Type': 'application/json'
-          }
-        end
-
-        def deserialize_response(payload)
-
-        end
-
-        def serialize_response_error(payload)
-          data = JSON.parse(payload)
-
-          falts = []
-          if data.has_key?('violacoes')
-            data['violacoes'].each do |falt|
-              d = BradescoApi::Entity::Errors::Falt.new(
-                reason: falt['razao'],
-                property: falt['propriedade'],
-                value: falt['valor'],
-              )
-
-              falts << d
-            end
-          end
-
-          BradescoApi::Entity::Errors::ResponseApi.new(
-            status: data['status'].to_s || '500',
-            type: data['type'],
-            title: data['title'],
-            falts: falts,
-            related_id: data['correlationId'] || '',
-          )
-        end
-
-
       end
     end
   end

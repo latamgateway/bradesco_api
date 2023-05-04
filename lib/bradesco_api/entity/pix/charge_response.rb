@@ -18,7 +18,6 @@ module BradescoApi
             payload: String,
           ).void
         end
-
         def initialize(payload)
           data = JSON.parse(payload)
 
@@ -26,7 +25,7 @@ module BradescoApi
             due_date: data['cobv']['calendario']['dataDeVencimento'],
             limit_after_due_date: data['cobv']['calendario']['validadeAposVencimento'],
             creation: data['cobv']['calendario']['criacao'],
-            )
+          )
 
           customer = BradescoApi::Entity::Pix::Attributes::Customer.new(
             document: data['cobv']['devedor']['cpf'] || data['cobv']['devedor']['cnpj'] || '',
@@ -36,7 +35,7 @@ module BradescoApi
             state: data['cobv']['devedor']['uf'],
             zip_code: data['cobv']['devedor']['cep'],
             email: data['cobv']['devedor']['email'] || '',
-            )
+          )
 
           seller = BradescoApi::Entity::Pix::Attributes::Seller.new(
             document: data['cobv']['recebedor']['cpf'] || data['cobv']['recebedor']['cnpj'] || '',
@@ -46,7 +45,7 @@ module BradescoApi
             state: data['cobv']['recebedor']['uf'],
             zip_code: data['cobv']['recebedor']['cep'],
             email: data['cobv']['recebedor']['email'] || '',
-            )
+          )
 
           locale = BradescoApi::Entity::Pix::Attributes::Locale.new(
             id: data['cobv']['loc']['id'],
@@ -81,7 +80,7 @@ module BradescoApi
           end
 
           if data['cobv']['valor'].include?('desconto')
-            if [1, 2].include?(data['cobv']['valor']['desconto']['modalidade'])
+            if is_modality_by_date?(data['cobv']['valor']['desconto']['modalidade'])
               fixed_date_arr = []
               data['cobv']['valor']['desconto']['descontoDataFixa'].each do |c|
                 fixed_date_arr << BradescoApi::Entity::Pix::Attributes::FixedDateDiscount.new(
@@ -119,6 +118,10 @@ module BradescoApi
           @base64 = data['base64']
           @seller = seller
 
+        end
+
+        def serialize
+          raise NoMethodError
         end
       end
     end
