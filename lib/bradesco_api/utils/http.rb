@@ -7,7 +7,6 @@ module BradescoApi
       def initialize(endpoint)
         pfx_file = ENV['BRADESCO_PIX_PFX_PATH']
         pfx_password = ENV['BRADESCO_PIX_PFX_PASSWORD']
-
         pkcs = OpenSSL::PKCS12.new(File.read(pfx_file), pfx_password)
         @key = pkcs.key.to_pem
         @cert = pkcs.certificate.to_pem
