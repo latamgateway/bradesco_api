@@ -14,10 +14,9 @@ module BradescoApi
         def create(payment)
           endpoint = "/v2/pix/#{payment.e2eid}/devolucao/#{payment.identifier}"
 
-          http = BradescoApi::Utils::HTTP.new()
+          http = BradescoApi::Utils::HTTP.new(endpoint)
 
           response = http.put(
-            endpoint: endpoint,
             payload: payment.serialize,
             headers: headers
           )
@@ -33,10 +32,9 @@ module BradescoApi
         def get(identifier)
           endpoint = "/v2/pix/#{e2eid}/devolucao/#{identifier}"
 
-          http = BradescoApi::Utils::HTTP.new()
+          http = BradescoApi::Utils::HTTP.new(endpoint)
 
           response = http.get(
-            endpoint: endpoint,
             headers: headers
           )
 

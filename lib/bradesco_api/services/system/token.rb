@@ -9,9 +9,9 @@ module BradescoApi
         end
 
         def create
-          http = BradescoApi::Utils::HTTP.new()
-
           endpoint = "/oauth/token"
+
+          http = BradescoApi::Utils::HTTP.new(endpoint)
 
           basic = Base64.strict_encode64("#{@client_id}:#{@client_secret}")
 
@@ -21,12 +21,11 @@ module BradescoApi
           }
 
           response = http.post(
-            endpoint: endpoint,
             payload: "grant_type=client_credentials",
             headers: headers
           )
 
-          if response.code.to_i == 200
+          if response.kind_of? Net::HTTPSuccess
             data = JSON.parse(response.read_body)
             token = BradescoApi::Entity::System::Token.new(
               access_token: data['access_token'],

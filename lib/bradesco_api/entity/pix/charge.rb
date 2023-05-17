@@ -18,7 +18,7 @@ module BradescoApi
         sig { returns(BradescoApi::Entity::Pix::Attributes::Value) }
         attr_accessor :value
 
-        sig { returns(BradescoApi::Entity::Pix::Attributes::AdditionalInformation) }
+        sig { returns(T.nilable(BradescoApi::Entity::Pix::Attributes::AdditionalInformation)) }
         attr_accessor :additional_information
 
         sig { returns(String) }
@@ -34,7 +34,7 @@ module BradescoApi
             qr_code_text: String,
             locale: BradescoApi::Entity::Pix::Attributes::Locale,
             calendar: BradescoApi::Entity::Pix::Attributes::Calendar,
-            additional_information: BradescoApi::Entity::Pix::Attributes::AdditionalInformation
+            additional_information: T.nilable(BradescoApi::Entity::Pix::Attributes::AdditionalInformation)
           ).void
         end
         def initialize(
