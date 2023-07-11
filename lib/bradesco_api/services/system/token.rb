@@ -6,9 +6,6 @@ module BradescoApi
         def initialize()
           @client_id = ENV['BRADESCO_PIX_CLIENT_ID']
           @client_secret = ENV['BRADESCO_PIX_CLIENT_SECRET']
-
-          puts @client_id
-          puts @client_secret
         end
 
         def create

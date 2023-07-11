@@ -62,7 +62,6 @@ RSpec.describe BradescoApi::Entity::Pix::Charge do
       identifier: identifier,
       customer: customer,
       value: value,
-      pix_key: pix_key,
       free_text: free_text,
       calendar: calendar
     )
@@ -82,10 +81,6 @@ RSpec.describe BradescoApi::Entity::Pix::Charge do
         expect(charge.value).to eq(value)
       end
 
-      it "sets pix_key" do
-        expect(charge.pix_key).to eq(pix_key)
-      end
-
       it "sets free_text" do
         expect(charge.free_text).to eq(free_text)
       end
@@ -97,7 +92,6 @@ RSpec.describe BradescoApi::Entity::Pix::Charge do
           described_class.new(
             customer: customer,
             value: value,
-            pix_key: pix_key,
             free_text: free_text
           )
         }.to raise_error(ArgumentError)
@@ -108,7 +102,6 @@ RSpec.describe BradescoApi::Entity::Pix::Charge do
           described_class.new(
             identifier: identifier,
             value: value,
-            pix_key: pix_key,
             free_text: free_text
           )
         }.to raise_error(ArgumentError)
@@ -119,18 +112,6 @@ RSpec.describe BradescoApi::Entity::Pix::Charge do
           described_class.new(
             identifier: identifier,
             customer: customer,
-            pix_key: pix_key,
-            free_text: free_text
-          )
-        }.to raise_error(ArgumentError)
-      end
-
-      it "raises ArgumentError without pix_key" do
-        expect {
-          described_class.new(
-            identifier: identifier,
-            customer: customer,
-            value: value,
             free_text: free_text
           )
         }.to raise_error(ArgumentError)
@@ -144,7 +125,6 @@ RSpec.describe BradescoApi::Entity::Pix::Charge do
     it { is_expected.to respond_to(:customer) }
     it { is_expected.to respond_to(:value) }
     it { is_expected.to respond_to(:additional_information) }
-    it { is_expected.to respond_to(:pix_key) }
     it { is_expected.to respond_to(:free_text) }
     it { is_expected.to respond_to(:qr_code_text) }
     it { is_expected.to respond_to(:identifier) }
@@ -183,7 +163,7 @@ RSpec.describe BradescoApi::Entity::Pix::Charge do
                 ]
               }
             },
-          "chave":"4581f4b7-957f-4aba-9ae8-c1c174e9452c",
+          "chave": ENV['BRADESCO_PIX_KEY'],
           "solicitacaoPagador":"Informar matrícula"
         }
       )
