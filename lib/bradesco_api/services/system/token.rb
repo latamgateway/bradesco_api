@@ -6,6 +6,9 @@ module BradescoApi
         def initialize()
           @client_id = ENV['BRADESCO_PIX_CLIENT_ID']
           @client_secret = ENV['BRADESCO_PIX_CLIENT_SECRET']
+
+          puts @client_id
+          puts @client_secret
         end
 
         def create
@@ -24,6 +27,8 @@ module BradescoApi
             payload: "grant_type=client_credentials",
             headers: headers
           )
+
+          puts response
 
           if response.kind_of? Net::HTTPSuccess
             data = JSON.parse(response.read_body)

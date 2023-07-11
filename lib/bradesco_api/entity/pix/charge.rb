@@ -22,14 +22,13 @@ module BradescoApi
         attr_accessor :additional_information
 
         sig { returns(String) }
-        attr_accessor :pix_key, :free_text, :qr_code_text, :identifier
+        attr_accessor :free_text, :qr_code_text, :identifier
 
         sig do
           params(
             identifier: String,
             customer: BradescoApi::Entity::Pix::Attributes::Customer,
             value: BradescoApi::Entity::Pix::Attributes::Value,
-            pix_key: String,
             free_text: String,
             qr_code_text: String,
             locale: BradescoApi::Entity::Pix::Attributes::Locale,
@@ -41,7 +40,6 @@ module BradescoApi
           identifier:,
           customer:,
           value:,
-          pix_key:,
           free_text: '',
           qr_code_text: '',
           locale: nil,
@@ -53,7 +51,6 @@ module BradescoApi
           @locale = locale
           @customer = customer
           @value = value
-          @pix_key = pix_key
           @free_text = free_text
           @qr_code_text = qr_code_text
           @additional_information = additional_information
@@ -77,7 +74,7 @@ module BradescoApi
             "valor": {
               "original": @value.original,
             },
-            "chave": @pix_key,
+            "chave": ENV['BRADESCO_PIX_KEY'],
             "solicitacaoPagador": @free_text
           }
 
@@ -112,7 +109,6 @@ module BradescoApi
           unless @qr_code_text.empty?
             payload["nomePersonalizacaoQr"] = @qr_code_text
           end
-
           JSON.dump(payload)
         end
 
@@ -137,7 +133,6 @@ module BradescoApi
             "valorPerc": common_value.percentage_value
           }
         end
-
       end
     end
   end
