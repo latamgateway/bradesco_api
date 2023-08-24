@@ -52,11 +52,11 @@ module BradescoApi
             type: data['cobv']['loc']['tipoCob'],
             location: data['cobv']['loc']['location'],
             creation: data['cobv']['loc']['criacao'],
-            )
+          )
 
           value = BradescoApi::Entity::Pix::Attributes::Value.new(
             original: data['cobv']['valor']['original'],
-            )
+          )
 
           if data['cobv']['valor'].include?('multa')
             value.fine_for_delay = BradescoApi::Entity::Pix::Attributes::FineForDelay.new(
@@ -112,10 +112,9 @@ module BradescoApi
 
           @revision = data['cobv']['revisao']
           @status = data['cobv']['status']
-          @emv = data['cobv']['emv']
+          @emv = data['emv']
           @base64 = data['base64']
           @seller = seller
-
         end
 
         def serialize

@@ -58,19 +58,25 @@ module BradescoApi
 
         sig { returns(String) }
         def serialize
+
+          payer = {
+            nome: @customer.name
+          }
+
+          payer_document_key = @customer.document.length > 11 ? "cnpj" : "cpf"
+          payer[payer_document_key] = @customer.document
+
+          payer[:logradouro] = @customer.address unless @customer.address.empty?
+          payer[:cidade] = @customer.city unless @customer.city.empty?
+          payer[:uf] = @customer.state unless @customer.state.empty?
+          payer[:cep] = @customer.zip_code unless @customer.zip_code.empty?
+
           payload = {
             "calendario": {
               "dataDeVencimento": @calendar.due_date,
               "validadeAposVencimento": @calendar.limit_after_due_date
             },
-            "devedor": {
-              "logradouro": @customer.address,
-              "cidade": @customer.city,
-              "uf": @customer.state,
-              "cep": @customer.zip_code,
-              "cpf": @customer.document,
-              "nome": @customer.name
-            },
+            "devedor": payer,
             "valor": {
               "original": @value.original,
             },
@@ -109,6 +115,7 @@ module BradescoApi
           unless @qr_code_text.empty?
             payload["nomePersonalizacaoQr"] = @qr_code_text
           end
+
           JSON.dump(payload)
         end
 

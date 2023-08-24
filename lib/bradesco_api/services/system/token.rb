@@ -2,12 +2,14 @@ module BradescoApi
   module Services
     module System
       class Token
+        extend T::Sig
 
         def initialize()
           @client_id = ENV['BRADESCO_PIX_CLIENT_ID']
           @client_secret = ENV['BRADESCO_PIX_CLIENT_SECRET']
         end
 
+        # sig { returns(BradescoApi::Entity::System::Token) }
         def create
           endpoint = "/oauth/token"
 
@@ -25,20 +27,18 @@ module BradescoApi
             headers: headers
           )
 
-          puts response
+          data = JSON.parse(response.read_body)
 
-          if response.kind_of? Net::HTTPSuccess
-            data = JSON.parse(response.read_body)
-            token = BradescoApi::Entity::System::Token.new(
-              access_token: data['access_token'],
-              token_type: data['token_type'],
-              expires_in: data['expires_in']
-            )
+          raise BradescoApi::Exceptions::BradescoError.new(
+            reason: data["error"],
+            message: data["error_description"]
+          ) unless response.kind_of? Net::HTTPSuccess
 
-            token
-          end
-
-          # raise exception or something
+          BradescoApi::Entity::System::Token.new(
+            access_token: data['access_token'],
+            token_type: data['token_type'],
+            expires_in: data['expires_in']
+          )
         end
       end
     end

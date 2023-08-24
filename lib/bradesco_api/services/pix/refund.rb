@@ -9,7 +9,7 @@ module BradescoApi
 
         sig do
           params(payment: BradescoApi::Entity::Pix::Refund)
-            .returns(T.any(BradescoApi::Entity::Pix::RefundResponse, BradescoApi::Entity::Errors::ResponseApi))
+            .returns(BradescoApi::Entity::Pix::RefundResponse)
         end
         def create(payment)
           endpoint = "/v2/pix/#{payment.e2eid}/devolucao/#{payment.identifier}"
@@ -21,13 +21,12 @@ module BradescoApi
             headers: headers
           )
 
-          return BradescoApi::Entity::Pix::RefundResponse.new(response.read_body) if response.kind_of? Net::HTTPSuccess
-          BradescoApi::Entity::Errors::ResponseApi.new(response.read_body)
+          BradescoApi::Entity::Pix::RefundResponse.new(response.read_body)
         end
 
         sig do
           params(e2eid, String, identifier: String)
-            .returns(T.any(BradescoApi::Entity::Pix::RefundResponse, BradescoApi::Entity::Errors::ResponseApi))
+            .returns(BradescoApi::Entity::Pix::RefundResponse)
         end
         def get(identifier)
           endpoint = "/v2/pix/#{e2eid}/devolucao/#{identifier}"
@@ -38,8 +37,7 @@ module BradescoApi
             headers: headers
           )
 
-          return BradescoApi::Entity::Pix::RefundResponse.new(response.read_body) if response.kind_of? Net::HTTPSuccess
-          BradescoApi::Entity::Errors::ResponseApi.new(response.read_body)
+          BradescoApi::Entity::Pix::RefundResponse.new(response.read_body)
         end
       end
     end

@@ -1,3 +1,5 @@
+require "base64"
+
 module BradescoApi
   module Utils
     class HTTP
@@ -5,9 +7,13 @@ module BradescoApi
 
       sig { params(endpoint: String).void }
       def initialize(endpoint)
-        pfx_file = ENV['BRADESCO_PIX_PFX_PATH']
+        # The pfx file is stored in enviroment variables in a base64 string
+        pfx_base64 = ENV['BRADESCO_PIX_PFX_BASE64_FILE']
+        pfx_file = Base64.decode64(pfx_base64)
+
         pfx_password = ENV['BRADESCO_PIX_PFX_PASSWORD']
-        pkcs = OpenSSL::PKCS12.new(File.read(pfx_file), pfx_password)
+
+        pkcs = OpenSSL::PKCS12.new(pfx_file, pfx_password)
         @key = pkcs.key.to_pem
         @cert = pkcs.certificate.to_pem
         @base_url = ENV['BRADESCO_PIX_BASE_URL']
@@ -26,13 +32,7 @@ module BradescoApi
         ).returns(T.untyped)
       end
       def post(payload:, headers: {})
-        request = Net::HTTP::Post.new(@url)
-        headers.each do |key, value|
-          request[key] = value
-        end
-
-        request.body = payload
-
+        request = call('post', headers, payload)
         @https.request(request)
       end
 
@@ -43,13 +43,7 @@ module BradescoApi
           ).returns(T.untyped)
       end
       def put(payload:, headers: {})
-        request = Net::HTTP::Put.new(@url)
-        headers.each do |key, value|
-          request[key] = value
-        end
-
-        request.body = payload
-
+        request = call('put', headers, payload)
         @https.request(request)
       end
 
@@ -59,12 +53,48 @@ module BradescoApi
           ).returns(T.untyped)
       end
       def get(headers: {})
-        request = Net::HTTP::Get.new(@url)
+        request = call('get', headers)
+        @https.request(request)
+      end
+
+
+      private
+
+      sig do
+        type_parameters(:Instance)
+          .params(
+            http_verb: String,
+            headers: T::Hash[String, String],
+            payload: T::nilable(String)).
+          returns(T.untyped)
+      end
+      def call(http_verb, headers, payload = nil)
+        http_request = parse_http_verb(http_verb)
+        request = http_request.new(@url)
         headers.each do |key, value|
           request[key] = value
         end
 
-        @https.request(request)
+        request.body = payload unless payload.nil?
+
+        request
+      end
+
+      sig do
+          params(verb: String)
+          .returns(T.untyped)
+      end
+      def parse_http_verb(verb)
+        case verb
+        when 'get'
+          return Net::HTTP::Get
+        when 'post'
+          return Net::HTTP::Post
+        when 'put'
+          return Net::HTTP::Put
+        else
+          raise BradescoApi::Exceptions::BradescoError.new("http_verb", "HTTP verb not mapped")
+        end
       end
 
     end
