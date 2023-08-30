@@ -28,7 +28,6 @@ module BradescoApi
           )
 
           data = JSON.parse(response.read_body)
-
           raise BradescoApi::Exceptions::BradescoError.new(
             reason: data["error"],
             message: data["error_description"]

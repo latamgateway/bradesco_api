@@ -12,7 +12,7 @@ module BradescoApi
             .returns(BradescoApi::Entity::Pix::ChargeResponse)
         end
         def create(charge)
-          endpoint = "/v2/cobv-emv/#{charge.identifier}"
+          endpoint = "/v2/cobv/#{charge.identifier}"
           http = BradescoApi::Utils::HTTP.new(endpoint)
           response = http.put(payload: charge.serialize, headers: headers)
           BradescoApi::Entity::Pix::ChargeResponse.new(response.read_body)

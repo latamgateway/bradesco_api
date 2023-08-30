@@ -1,7 +1,6 @@
 module BradescoApi
   module Entity
     module Pix
-
       class RefundResponseTime
         extend T::Sig
 

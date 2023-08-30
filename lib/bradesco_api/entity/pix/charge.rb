@@ -22,7 +22,7 @@ module BradescoApi
         attr_accessor :additional_information
 
         sig { returns(String) }
-        attr_accessor :free_text, :qr_code_text, :identifier
+        attr_accessor :free_text, :identifier
 
         sig do
           params(
@@ -30,7 +30,6 @@ module BradescoApi
             customer: BradescoApi::Entity::Pix::Attributes::Customer,
             value: BradescoApi::Entity::Pix::Attributes::Value,
             free_text: String,
-            qr_code_text: String,
             locale: BradescoApi::Entity::Pix::Attributes::Locale,
             calendar: BradescoApi::Entity::Pix::Attributes::Calendar,
             additional_information: T.nilable(BradescoApi::Entity::Pix::Attributes::AdditionalInformation)
@@ -41,7 +40,6 @@ module BradescoApi
           customer:,
           value:,
           free_text: '',
-          qr_code_text: '',
           locale: nil,
           calendar: nil,
           additional_information: nil
@@ -52,7 +50,6 @@ module BradescoApi
           @customer = customer
           @value = value
           @free_text = free_text
-          @qr_code_text = qr_code_text
           @additional_information = additional_information
         end
 
@@ -80,9 +77,10 @@ module BradescoApi
             "valor": {
               "original": @value.original,
             },
-            "chave": ENV['BRADESCO_PIX_KEY'],
-            "solicitacaoPagador": @free_text
+            "chave": ENV['BRADESCO_PIX_KEY']
           }
+
+          payload[:solicitacaoPagador] = @free_text unless @free_text.empty?
 
           payload[:valor]["multa"] = common_value_attrs(@value.fine_for_delay) unless @value.fine_for_delay.nil?
           payload[:valor]["juros"] = common_value_attrs(@value.tax) unless @value.tax.nil?
@@ -110,10 +108,6 @@ module BradescoApi
               **discount,
               "descontoDataFixa": is_modality_by_date?(@value.discount.modality) ? fixed_dates : []
             }
-          end
-
-          unless @qr_code_text.empty?
-            payload["nomePersonalizacaoQr"] = @qr_code_text
           end
 
           JSON.dump(payload)
