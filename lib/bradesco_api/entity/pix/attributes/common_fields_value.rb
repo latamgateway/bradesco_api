@@ -10,7 +10,7 @@ module BradescoApi
 
           sig { returns(String) }
           attr_accessor :percentage_value
-       
+
           sig { params(modality: Integer, percentage_value: String).void }
           def initialize(modality:, percentage_value:)
             @modality = modality

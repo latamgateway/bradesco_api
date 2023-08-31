@@ -7,13 +7,16 @@ module BradescoApi
         extend T::Sig
 
         sig { returns(String) }
-        attr_accessor :identifier, :e2eid, :value, :operation, :description
+        attr_accessor :identifier, :e2eid, :operation, :description
+
+        sig { returns(Float) }
+        attr_accessor :value
 
         sig do
           params(
             identifier: String,
             e2eid: String,
-            value: String,
+            value: Float,
             operation: String,
             description: String
           ).void
@@ -34,13 +37,7 @@ module BradescoApi
 
         sig { returns(String) }
         def serialize
-          payload = {
-            "valor": @value
-          }
-
-          payload["natureza"] = @operation unless @operation.empty?
-          payload["descricao"] = @description unless @description.empty?
-
+          payload = { "valor": sprintf('%.2f', @value.to_s) }
           JSON.dump(payload)
         end
       end

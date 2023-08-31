@@ -53,6 +53,7 @@ GEM
       hashdiff (>= 0.4.0, < 2.0.0)
 
 PLATFORMS
+  ruby
   x86_64-linux
 
 DEPENDENCIES
@@ -63,9 +64,6 @@ DEPENDENCIES
   sorbet-static
   vcr
   webmock
-
-RUBY VERSION
-   ruby 2.7.6p219
 
 BUNDLED WITH
    2.4.13

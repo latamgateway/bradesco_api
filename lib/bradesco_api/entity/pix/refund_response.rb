@@ -5,23 +5,20 @@ module BradescoApi
         extend T::Sig
 
         sig { returns(String) }
-        attr_accessor :creation, :settlement, :cause
+        attr_accessor :creation, :settlement
 
         sig do
           params(
             creation: String,
-            settlement: String,
-            cause: String
+            settlement: String
           ).void
         end
         def initialize(
           creation: '',
-          settlement: '',
-          cause: ''
+          settlement: ''
         )
           @creation = creation
           @settlement = settlement
-          @cause = cause
         end
 
       end
@@ -30,7 +27,7 @@ module BradescoApi
         extend T::Sig
 
         sig { returns(String) }
-        attr_accessor :status, :rtr_id
+        attr_accessor :status, :rtr_id, :json
 
         sig { returns(T.nilable(BradescoApi::Entity::Pix::RefundResponseTime)) }
         attr_accessor :time
@@ -39,27 +36,26 @@ module BradescoApi
         def initialize(payload)
           data = JSON.parse(payload)
 
+          puts "Data refund: #{payload}"
+
           super(
             identifier: data['id'],
             e2eid: '',
-            value: data['valor'],
-            operation: data['natureza'],
-            description: data['descricao']
+            value: data['valor'].to_f
           )
 
-          @status = status
-          @rtr_id = rtr_id
+          @json = payload
+          @status = data['status']
+          @rtr_id = data['rtr_id']
 
           time = nil
           if data.include?('horario')
             creation = data['horario']['solicitacao'] if data['horario'].include?('solicitacao')
             settlement = data['horario']['liquidacao'] if data['horario'].include?('liquidacao')
-            cause = data['horario']['motivo'] if data['horario'].include?('motivo')
 
             time = BradescoApi::Entity::Pix::RefundResponseTime.new(
               creation: creation,
-              settlement: settlement,
-              cause: cause
+              settlement: settlement
             )
           end
 

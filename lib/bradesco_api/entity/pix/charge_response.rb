@@ -70,7 +70,7 @@ module BradescoApi
           )
 
           value = BradescoApi::Entity::Pix::Attributes::Value.new(
-            original: data['valor']['original'],
+            original: data['valor']['original'].to_f,
           )
 
           if data['valor'].include?('multa')

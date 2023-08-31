@@ -22,7 +22,7 @@ module BradescoApi
 
           sig do
             params(
-              original: String,
+              original: Float,
               fine_for_delay: T.nilable(BradescoApi::Entity::Pix::Attributes::FineForDelay),
               tax: T.nilable(BradescoApi::Entity::Pix::Attributes::Tax),
               discount: T.nilable(BradescoApi::Entity::Pix::Attributes::Discount),

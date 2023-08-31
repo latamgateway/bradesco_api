@@ -12,11 +12,9 @@ module BradescoApi
         # sig { returns(BradescoApi::Entity::System::Token) }
         def create
           endpoint = "/oauth/token"
-
           http = BradescoApi::Utils::HTTP.new(endpoint)
 
           basic = Base64.strict_encode64("#{@client_id}:#{@client_secret}")
-
           headers = {
             'Authorization': "Basic #{basic}",
             'Content-Type': 'application/x-www-form-urlencoded'

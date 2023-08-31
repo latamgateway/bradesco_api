@@ -75,7 +75,7 @@ module BradescoApi
             },
             "devedor": payer,
             "valor": {
-              "original": @value.original,
+              "original": sprintf('%.2f', @value.original),
             },
             "chave": ENV['BRADESCO_PIX_KEY']
           }
