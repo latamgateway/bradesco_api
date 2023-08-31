@@ -5,7 +5,7 @@ module BradescoApi
         class Value < BradescoApi::Entity::Pix::Attributes::CommonFieldsValue
           extend T::Sig
 
-          sig { returns(String) }
+          sig { returns(Float) }
           attr_accessor :original
 
           sig { returns(T.nilable(BradescoApi::Entity::Pix::Attributes::FineForDelay)) }
