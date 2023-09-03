@@ -36,8 +36,6 @@ module BradescoApi
         def initialize(payload)
           data = JSON.parse(payload)
 
-          puts "Data refund: #{payload}"
-
           super(
             identifier: data['id'],
             e2eid: '',
