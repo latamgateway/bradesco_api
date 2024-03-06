@@ -17,7 +17,7 @@ module BradescoApi
             id: String,
             identifier: String,
             status: String,
-            amount: String,
+            amount: Float,
             time: BradescoApi::Entity::Pix::Attributes::ReversalTime,
             reason: String,
           ).void
