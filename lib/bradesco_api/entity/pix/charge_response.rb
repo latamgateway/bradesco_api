@@ -140,11 +140,11 @@ module BradescoApi
 
                   reversals << BradescoApi::Entity::Pix::Attributes::Reversal.new(
                     id: d['id'],
-                    identifier: d['txid'],
+                    identifier: d['rtrId'],
                     status: d['status'],
                     amount: d['valor'].to_f,
                     time: time,
-                    reason:  d['status']
+                    reason:  d['motivo']
                   )
                 end
               end
