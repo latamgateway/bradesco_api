@@ -13,6 +13,9 @@ module BradescoApi
         sig { returns(BradescoApi::Entity::Pix::Attributes::Seller) }
         attr_accessor :seller
 
+        sig { returns(T.nilable(T::Array[BradescoApi::Entity::Pix::Attributes::PixData])) }
+        attr_accessor :pix
+
         sig do
           params(
             payload: String,
@@ -118,6 +121,46 @@ module BradescoApi
 
           free_text = data.include?('solicitacaoPagador') ? data['solicitacaoPagador'] : ''
 
+          pixes = []
+          if data.include?('pix')
+            data['pix'].each do |p|
+              payer = BradescoApi::Entity::Pix::Attributes::Payer.new(
+                name: p['pagador']['nome'],
+                document: p['pagador']['cpf'] || p['pagador']['cnpj']
+              )
+
+              reversals = []
+
+              if data['pix'].include?('devolucoes')
+                data['pix']['devolucoes'].each do |d|
+                  time = BradescoApi::Entity::Pix::Attributes::ReversalTime.new(
+                    settlement: d['horario']['liquidacao'],
+                    request: d['horario']['solicitacao']
+                  )
+
+                  reversals << BradescoApi::Entity::Pix::Attributes::Reversal.new(
+                    id: d['id'],
+                    identifier: d['txid'],
+                    status: d['status'],
+                    amount: d['valor'].to_f,
+                    time: time,
+                    reason:  d['status']
+                  )
+                end
+              end
+
+              pix = BradescoApi::Entity::Pix::Attributes::PixData.new(
+                payment_id: p['endToEndId'],
+                identifier: p['txid'],
+                date: p['horario'],
+                amount: p['valor'].to_f,
+                payer: payer,
+                reversals: reversals
+              )
+              pixes << pix
+            end
+          end
+
           super(
             identifier: data['txid'],
             customer: customer,
@@ -132,6 +175,7 @@ module BradescoApi
           @emv = data['pixCopiaECola']
           @seller = seller
           @json = payload
+          @pix = pixes
         end
 
         def serialize
