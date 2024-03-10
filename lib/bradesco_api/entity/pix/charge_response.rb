@@ -134,8 +134,8 @@ module BradescoApi
               if p.include?('devolucoes')
                 p['devolucoes'].each do |d|
                   time = BradescoApi::Entity::Pix::Attributes::ReversalTime.new(
-                    settlement: d['horario']['liquidacao'],
-                    request: d['horario']['solicitacao']
+                    settlement: d['horario']['liquidacao'] || '',
+                    request: d['horario']['solicitacao'] || ''
                   )
 
                   reversals << BradescoApi::Entity::Pix::Attributes::Reversal.new(
