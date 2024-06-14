@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    bradesco_api (1.0.0)
+    bradesco_api (1.2.0)
       cpf_cnpj
       sorbet-runtime
 
@@ -42,7 +42,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
     rspec-support (3.12.1)
-    sorbet-runtime (0.5.10990)
+    sorbet-runtime (0.5.11430)
     sorbet-static (0.5.10990-x86_64-linux)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)

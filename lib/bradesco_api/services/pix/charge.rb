@@ -13,7 +13,7 @@ module BradescoApi
         end
         def create(charge)
           endpoint = "/v2/cobv/#{charge.identifier}"
-          http = BradescoApi::Utils::HTTP.new(endpoint)
+          http = BradescoApi::Utils::HTTP.new(endpoint: endpoint, setup: @setup)
           response = http.put(payload: charge.serialize, headers: headers)
 
           raise_error(
@@ -29,7 +29,7 @@ module BradescoApi
         end
         def get(identifier)
           endpoint = "/v2/cobv/#{identifier}"
-          http = BradescoApi::Utils::HTTP.new(endpoint)
+          http = BradescoApi::Utils::HTTP.new(endpoint: endpoint, setup: @setup)
           response = http.get(headers: headers)
 
           raise_error(

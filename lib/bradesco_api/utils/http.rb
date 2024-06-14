@@ -5,18 +5,22 @@ module BradescoApi
     class HTTP
       extend T::Sig
 
-      sig { params(endpoint: String).void }
-      def initialize(endpoint)
-        # The pfx file is stored in enviroment variables in a base64 string
-        pfx_base64 = ENV['BRADESCO_PIX_PFX_BASE64_FILE']
+      sig do
+        params(
+          endpoint: String,
+          setup: BradescoApi::Entity::System::Setup
+        ).void
+      end
+      def initialize(endpoint:, setup:)
+        # The pfx file is stored in environment variables in a base64 string
+        pfx_base64 = setup.certificate
         pfx_file = Base64.decode64(pfx_base64)
-
-        pfx_password = ENV['BRADESCO_PIX_PFX_PASSWORD']
+        pfx_password = setup.password
 
         pkcs = OpenSSL::PKCS12.new(pfx_file, pfx_password)
         @key = pkcs.key.to_pem
         @cert = pkcs.certificate.to_pem
-        @base_url = ENV['BRADESCO_PIX_BASE_URL']
+        @base_url = setup.base_url
 
         @url = URI("#{@base_url}#{endpoint}")
         @https = Net::HTTP.new(@url.host, @url.port)
