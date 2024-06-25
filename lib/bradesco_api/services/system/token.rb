@@ -4,15 +4,19 @@ module BradescoApi
       class Token
         extend T::Sig
 
-        def initialize()
-          @client_id = ENV['BRADESCO_PIX_CLIENT_ID']
-          @client_secret = ENV['BRADESCO_PIX_CLIENT_SECRET']
+        sig do
+          params(setup: BradescoApi::Entity::System::Setup).void
+        end
+        def initialize(setup:)
+          @setup = setup
+          @client_id = @setup.client_id
+          @client_secret = @setup.client_secret
         end
 
         # sig { returns(BradescoApi::Entity::System::Token) }
         def create
           endpoint = "/oauth/token"
-          http = BradescoApi::Utils::HTTP.new(endpoint)
+          http = BradescoApi::Utils::HTTP.new(endpoint: endpoint, setup: @setup)
 
           basic = Base64.strict_encode64("#{@client_id}:#{@client_secret}")
           headers = {

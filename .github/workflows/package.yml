@@ -1,0 +1,50 @@
+name: Publish Package
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to publish'
+        required: true
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7.6'
+
+      - name: Extract tag
+        id: get_version
+        run: |
+          export VERSION=${{ github.event.inputs.tag }}
+          if [ -z "$VERSION" ]; then
+            VERSION=$(echo ${{ github.ref }} | sed -e 's/refs\/tags\///')
+          fi
+          echo $VERSION > VERSION
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Build Package
+        run: |
+          gem build
+
+      - name: Ruby Setup
+        uses: ruby/setup-ruby@v1
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN_PACKAGES }}
+        with:
+          ruby-version: '2.7.6'
+
+      - name: Publish Package
+        run: |
+          export PACKAGE_NAME=$(grep -o "spec.name\s*=\s*['\"].*['\"]" *.gemspec | sed "s/spec.name\s*=\s*['\"]\(.*\)['\"]/\1/")
+          echo ":github: ${{ secrets.GH_TOKEN_PACKAGES }}" > ~/.gem/credentials
+          chmod 600 ~/.gem/credentials
+          gem push ${PACKAGE_NAME}-${{ steps.get_version.outputs.VERSION }}.gem --key github --host https://rubygems.pkg.github.com/${{ github.repository_owner }}

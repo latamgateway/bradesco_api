@@ -60,6 +60,7 @@ RSpec.describe BradescoApi::Entity::Pix::Charge do
   subject(:charge) do
     described_class.new(
       identifier: identifier,
+      pix_key: '12345',
       customer: customer,
       value: value,
       free_text: free_text,
@@ -163,7 +164,7 @@ RSpec.describe BradescoApi::Entity::Pix::Charge do
                 ]
               }
             },
-          "chave": ENV['BRADESCO_PIX_KEY'],
+          "chave": '12345',
           "solicitacaoPagador":"Informar matrícula"
         }
       )

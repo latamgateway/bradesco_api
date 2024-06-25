@@ -48,13 +48,12 @@ module BradescoApi
 
           time = nil
           if data.include?('horario')
-            creation = data['horario']['solicitacao'] if data['horario'].include?('solicitacao')
-            settlement = data['horario']['liquidacao'] if data['horario'].include?('liquidacao')
+            payload = {}
 
-            time = BradescoApi::Entity::Pix::RefundResponseTime.new(
-              creation: creation,
-              settlement: settlement
-            )
+            payload[:creation] = data['horario']['solicitacao'] if data['horario'].include?('solicitacao')
+            payload[:settlement] = data['horario']['liquidacao'] if data['horario'].include?('liquidacao')
+
+            time = BradescoApi::Entity::Pix::RefundResponseTime.new(**payload)
           end
 
           @time = time

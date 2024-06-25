@@ -162,6 +162,7 @@ module BradescoApi
           end
 
           super(
+            pix_key: data['chave'],
             identifier: data['txid'],
             customer: customer,
             value: value,

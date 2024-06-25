@@ -22,11 +22,12 @@ module BradescoApi
         attr_accessor :additional_information
 
         sig { returns(String) }
-        attr_accessor :free_text, :identifier
+        attr_accessor :free_text, :identifier, :pix_key
 
         sig do
           params(
             identifier: String,
+            pix_key: String,
             customer: BradescoApi::Entity::Pix::Attributes::Customer,
             value: BradescoApi::Entity::Pix::Attributes::Value,
             free_text: String,
@@ -37,6 +38,7 @@ module BradescoApi
         end
         def initialize(
           identifier:,
+          pix_key:,
           customer:,
           value:,
           free_text: '',
@@ -45,6 +47,7 @@ module BradescoApi
           additional_information: nil
         )
           @identifier = identifier
+          @pix_key = pix_key
           @calendar = calendar
           @locale = locale
           @customer = customer
@@ -55,7 +58,6 @@ module BradescoApi
 
         sig { returns(String) }
         def serialize
-
           payer = {
             nome: @customer.name
           }
@@ -77,7 +79,7 @@ module BradescoApi
             "valor": {
               "original": sprintf('%.2f', @value.original),
             },
-            "chave": ENV['BRADESCO_PIX_KEY']
+            "chave": @pix_key
           }
 
           payload[:solicitacaoPagador] = @free_text unless @free_text.empty?
